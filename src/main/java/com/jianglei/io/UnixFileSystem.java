@@ -5,6 +5,17 @@ package com.jianglei.io;
  */
 public class UnixFileSystem {
 
+    /**
+     * 一个正常的UNIX路径不包含重复的斜线，且不以斜线结尾
+     * 正常的路径名有可能是空字符串
+     *
+     * 正常化指定的路径名，路径名的长度是len, 以给定的off的开始,
+     * 在off之前的字符都被认为是正常的
+     * @param pathname 待标准化的路径名
+     * @param len  路径名的长度
+     * @param off  要标准化的起始位置
+     * @return 标准化的路径名
+     */
     public String normalize(String pathname, int len, int off) {
         if (len == 0) {
             return pathname;
@@ -32,6 +43,22 @@ public class UnixFileSystem {
 
         return sb.toString();
     }
+
+    /**
+     * 检查给定的路径名是否是标准的，如果不是，调用真正的标准化方法使需要标准化的路径部分标准
+     * 通过这种方法，我们仅遍历整个路径一次就可以了
+     * 标准的路径：
+     *  1. ""
+     *  2. "/home/jianglei"
+     *  3. "./home/a/b/c/e"
+     *
+     * 不标准的路径
+     *  1. "a/b//c/e" -> "a/b/c/e"
+     *  2. "///////"  -> "/"
+     *  3. "b/c/d/"   -> "b/c/e"
+     * @param pathname 待检测的路径名
+     * @return 标准化的路径名
+     */
     public String normalize(String pathname) {
         int n = pathname.length();
         char preChar = 0;
